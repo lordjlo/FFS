@@ -152,7 +152,7 @@ async function importFromSheets(targetEmail = null, targetSpreadsheetId = null) 
                     suggested_reps: `S1: ${s1 || '?'}, S2: ${s2 || '?'}, S3: ${s3 || '?'}`,
                     instructions: sequenceCode ? `${sequenceCode}: ${instructions}` : instructions,
                     video_id: videoId
-                });
+                }, { onConflict: 'workout_id, name' });
             }
         }
 
