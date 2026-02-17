@@ -161,6 +161,9 @@ async function importFromSheets(targetEmail = null, targetSpreadsheetId = null) 
     } catch (error) {
         console.error('Error during import:', error.message);
         if (require.main === module) process.exit(1);
+        if (error.message.includes('403') || (error.response && error.response.status === 403)) {
+            throw new Error(`Permission Denied: Share sheet with ${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`);
+        }
         throw error;
     }
 }
