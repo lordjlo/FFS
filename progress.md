@@ -17,3 +17,13 @@
     *   Verified data integrity: Database seeded correctly (1 program, 10 workouts).
     *   Linting check: Minor warnings regarding `<img>` tags (action item).
     *   Created detailed log: [2026-02-17_verification.md](progress_logs/2026-02-17_verification.md).
+*   **Deployment**:
+    *   Git repository initialized and pushed to `https://github.com/lordjlo/FFS`.
+    *   Vercel deployment successful: `https://ffs-hazel.vercel.app`.
+    *   Updated Supabase Auth domains.
+    *   Updated workout input terminology to "Lowest Reps" and "Max Weight".
+*   **Review & Gap Analysis**:
+    *   Analyzed against B.L.A.S.T. framework.
+    *   Analyzed against S.I.T.E., P.A.G.E.S., and M.A.P.S. frameworks.
+    *   Found gaps in "Engine" (Suggested Weights), "Anchor" (Dashboard visuals), and "Stats" (User visibility).
+    *   Brainstormed solutions in `ideas.md`.

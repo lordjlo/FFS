@@ -41,13 +41,29 @@ export async function GET(request) {
 
         if (eError) throw eError
 
-        const mappedExercises = exercises.map(ex => {
+        const mappedExercises = await Promise.all(exercises.map(async (ex) => {
+            // Fetch the last log for this specific exercise name for this user
+            const { data: lastLog } = await supabase
+                .from('logs')
+                .select(`
+                    reps,
+                    weight,
+                    timestamp,
+                    exercises!inner ( name )
+                `)
+                .eq('user_id', user.id)
+                .eq('exercises.name', ex.name)
+                .order('timestamp', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
             const videoId = exerciseVideoMap && exerciseVideoMap[ex.name];
             return {
                 ...ex,
-                videoUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+                videoUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null,
+                lastLog: lastLog ? { reps: lastLog.reps, weight: lastLog.weight } : null
             };
-        });
+        }));
 
         return NextResponse.json({
             ...workout,

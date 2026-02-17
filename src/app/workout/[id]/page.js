@@ -81,14 +81,14 @@ export default function WorkoutPage({ params }) {
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-                            <input type="text" placeholder="Lowest Reps" style={{
+                            <input type="text" placeholder={ex.lastLog ? `Last: ${ex.lastLog.reps}` : "Lowest Reps"} style={{
                                 background: 'rgba(255,255,255,0.05)',
                                 border: '1px solid rgba(255,255,255,0.1)',
                                 padding: '0.75rem',
                                 borderRadius: '8px',
                                 color: 'white'
                             }} />
-                            <input type="text" placeholder="Max Weight" style={{
+                            <input type="text" placeholder={ex.lastLog ? `Last: ${ex.lastLog.weight}` : "Max Weight"} style={{
                                 background: 'rgba(255,255,255,0.05)',
                                 border: '1px solid rgba(255,255,255,0.1)',
                                 padding: '0.75rem',

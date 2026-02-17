@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ChevronRight, PlayCircle, ClipboardList, Calendar as CalendarIcon, Plus, CheckCircle2, Play, X, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Calendar from "@/components/Calendar";
+import DashboardHeader from "@/components/DashboardHeader";
+import ConsistencyCalendar from "@/components/ConsistencyCalendar";
 import { createClient } from "@/utils/supabase/client";
 
 export default function Dashboard() {
@@ -161,35 +163,9 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <header style={{
-                marginBottom: '3rem',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center'
-            }}>
-                <Link href="/">
-                    <img
-                        src="/logo.jpg"
-                        alt="FFS Kate Logo"
-                        style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '16px',
-                            marginBottom: '1.5rem',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                            cursor: 'pointer'
-                        }}
-                    />
-                </Link>
-                <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: 'var(--primary)', textTransform: 'capitalize' }}>
-                    Welcome back, {user?.email?.split('@')[0] || 'Kate'}
-                </h1>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-                    {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-                </p>
-            </header>
+            <DashboardHeader user={user} selectedDate={selectedDate} />
+
+            <ConsistencyCalendar user={user} />
 
             {/* Monthly Calendar View */}
             <section style={{ marginBottom: '3rem' }}>
