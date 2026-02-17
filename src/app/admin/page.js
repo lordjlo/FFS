@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Users, FileSpreadsheet, PlayCircle, AlertCircle, CheckCircle } from "lucide-react";
 
+import { isAdmin } from "@/utils/admin";
+
 export default function AdminPage() {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState("");
@@ -20,10 +22,14 @@ export default function AdminPage() {
         async function init() {
             const { data: { user } } = await supabase.auth.getUser();
 
-            // Basic Client-Side Gate (Real protection is on API)
-            // Ideally also check against ENV variable if exposed, but API will 403 anyway
+            // Client-Side Gate
             if (!user) {
                 router.push('/login');
+                return;
+            }
+
+            if (!isAdmin(user.email)) {
+                router.push('/dashboard'); // Kick non-admins back to dashboard
                 return;
             }
 

@@ -3,14 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@/utils/supabase/server'
 
+import { isAdmin } from '@/utils/admin';
+
 export async function GET(request) {
     try {
         const authClient = await createServerClient()
         const { data: { user } } = await authClient.auth.getUser()
 
         // 1. Security Check
-        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-        if (!user || !adminEmail || user.email !== adminEmail) {
+        if (!user || !isAdmin(user.email)) {
             return NextResponse.json({ error: 'Unauthorized: Admin access required' }, { status: 403 })
         }
 

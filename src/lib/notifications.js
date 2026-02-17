@@ -3,26 +3,28 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+import { getAdmins } from '@/utils/admin';
+
 export async function sendNewUserAlert(user) {
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    const adminEmails = getAdmins();
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'; // Default Resend test email
+
+    if (adminEmails.length === 0) {
+        console.error('⚠️ NEXT_PUBLIC_ADMIN_EMAIL not set. Cannot send notification.');
+        return { success: false, error: 'Admin email not configured' };
+    }
 
     if (!process.env.RESEND_API_KEY) {
         console.log('⚠️ RESEND_API_KEY not found. Simulating email notification:');
-        console.log(`To: ${adminEmail}`);
+        console.log(`To: ${adminEmails.join(', ')}`);
         console.log(`Subject: New User Signup - ${user.email}`);
         return { success: true, simulated: true };
-    }
-
-    if (!adminEmail) {
-        console.error('⚠️ NEXT_PUBLIC_ADMIN_EMAIL not set. Cannot send notification.');
-        return { success: false, error: 'Admin email not configured' };
     }
 
     try {
         const { data, error } = await resend.emails.send({
             from: fromEmail,
-            to: adminEmail,
+            to: adminEmails,
             subject: `🚀 New User Signup: ${user.user_metadata?.first_name || 'User'} (${user.email})`,
             html: `
                 <h1>New Client Alert!</h1>
