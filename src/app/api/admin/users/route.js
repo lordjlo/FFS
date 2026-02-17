@@ -8,10 +8,15 @@ import { isAdmin } from '@/utils/admin';
 export async function GET(request) {
     try {
         const authClient = await createServerClient()
-        const { data: { user } } = await authClient.auth.getUser()
+        const { data: { user }, error: authError } = await authClient.auth.getUser()
+
+        if (authError) throw authError;
+
+        console.log('Admin API Access Attempt:', user?.email);
 
         // 1. Security Check
         if (!user || !isAdmin(user.email)) {
+            console.warn('Admin API: Access denied for', user?.email);
             return NextResponse.json({ error: 'Unauthorized: Admin access required' }, { status: 403 })
         }
 

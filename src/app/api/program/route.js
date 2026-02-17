@@ -1,3 +1,4 @@
+import { createClient as createServerClient } from '@/utils/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import exerciseVideoMap from '@/scripts/exercise_videos.json'
@@ -9,12 +10,27 @@ export async function GET() {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         )
 
+        const authClient = await createServerClient();
+        const { data: { user } } = await authClient.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Auth required' }, { status: 401 });
+        }
+
+        // 1. Find the program owned by this user
         const { data: programs, error: pError } = await supabase
             .from('programs')
             .select('*')
-            .limit(1)
+            .eq('owner_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1);
 
-        if (pError || !programs.length) throw pError || new Error('No program found')
+        if (pError) throw pError;
+
+        if (!programs.length) {
+            return NextResponse.json({ message: 'No program assigned yet. Contact your coach!' }, { status: 404 });
+        }
+
         const program = programs[0]
 
         const { data: workouts, error: wError } = await supabase
