@@ -32,7 +32,12 @@ export default function AdminPage() {
 
             if (!isAdmin(user.email)) {
                 console.warn(`${user.email} is not in admin list:`, getAdmins());
-                router.push('/dashboard');
+                // router.push('/dashboard'); 
+                setStatus({
+                    type: 'error',
+                    message: `Access Denied. You are logged in as: ${user.email}. Allowed Admins: ${JSON.stringify(getAdmins())}`
+                });
+                setLoading(false);
                 return;
             }
 
