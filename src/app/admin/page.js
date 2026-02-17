@@ -45,11 +45,17 @@ export default function AdminPage() {
             try {
                 const res = await fetch('/api/admin/users');
                 if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    if (errorData.attempted) {
-                        throw new Error(`Server says no. Attempted: ${errorData.attempted}, Allowed: ${errorData.allowed}`);
+                    const text = await res.text();
+                    try {
+                        const errorData = JSON.parse(text);
+                        if (errorData.attempted) {
+                            throw new Error(`Server says no. Attempted: ${errorData.attempted}, Allowed: ${JSON.stringify(errorData.allowed)}`);
+                        }
+                        throw new Error(errorData.error || 'Unauthorized');
+                    } catch (e) {
+                        if (e.message.startsWith('Server says')) throw e;
+                        throw new Error(`API Error (${res.status}): ${text.substring(0, 100)}`);
                     }
-                    throw new Error('Unauthorized or Failed to load');
                 }
                 const data = await res.json();
                 if (mounted) setUsers(data);
@@ -58,9 +64,7 @@ export default function AdminPage() {
                 if (mounted) {
                     setStatus({
                         type: 'error',
-                        message: err.message === 'Unauthorized or Failed to load'
-                            ? 'Access Denied: You are not in the Admin List.'
-                            : `API Error: ${err.message}`
+                        message: err.message
                     });
                 }
             } finally {
