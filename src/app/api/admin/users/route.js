@@ -36,8 +36,8 @@ export async function GET(request) {
         // 3. Fetch all profiles
         const { data: profiles, error } = await supabase
             .from('profiles')
-            .select('id, email, display_name, created_at')
-            .order('created_at', { ascending: false });
+            .select('id, email, display_name')
+            .order('email', { ascending: true });
 
         if (error) throw error;
 
