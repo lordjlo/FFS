@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@/utils/supabase/server'
 
-import { isAdmin } from '@/utils/admin';
+import { isAdmin, getAdmins } from '@/utils/admin';
 
 export const dynamic = 'force-dynamic';
 
