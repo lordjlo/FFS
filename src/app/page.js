@@ -60,19 +60,22 @@ export default function Home() {
             </button>
           </Link>
 
-          <button style={{
-            background: 'transparent',
-            color: 'var(--primary)',
-            padding: '1rem 2rem',
-            borderRadius: 'var(--radius-pill)',
-            border: '1px solid var(--surface)',
-            fontSize: '1rem',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'var(--transition-smooth)'
-          }}>
-            Find Out More
-          </button>
+          <a href="https://www.instagram.com/ffs_kate/" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
+            <button style={{
+              background: 'transparent',
+              color: 'var(--primary)',
+              padding: '1rem 2rem',
+              borderRadius: 'var(--radius-pill)',
+              border: '1px solid var(--surface)',
+              fontSize: '1rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'var(--transition-smooth)',
+              width: '100%'
+            }}>
+              Find Out More
+            </button>
+          </a>
         </div>
       </div>
     </main>

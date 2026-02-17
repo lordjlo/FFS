@@ -37,7 +37,7 @@ export default function Navigation() {
         { name: "Home", href: "/", icon: <Home size={20} /> },
         { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard size={20} /> },
         { name: "My Program", href: "/dashboard", icon: <ClipboardList size={20} /> },
-        { name: "Contact & About", href: "#", icon: <Info size={20} />, isContact: true },
+        { name: "Contact & About", href: "https://www.instagram.com/ffs_kate/", icon: <Info size={20} />, isContact: true, external: true },
     ];
 
     const socialLinks = [
