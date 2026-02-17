@@ -19,11 +19,12 @@ export default function AdminPage() {
     const supabase = createClient();
 
     useEffect(() => {
-        async function init() {
-            const { data: { user } } = await supabase.auth.getUser();
+        let mounted = true;
+
+        async function checkUser(session) {
+            const user = session?.user;
             console.log('Admin Page Auth State:', { user: user?.email, admins: getAdmins() });
 
-            // Client-Side Gate
             if (!user) {
                 console.warn('No user found, redirecting to login');
                 router.push('/login');
@@ -32,12 +33,11 @@ export default function AdminPage() {
 
             if (!isAdmin(user.email)) {
                 console.warn(`${user.email} is not in admin list:`, getAdmins());
-                // router.push('/dashboard'); 
                 setStatus({
                     type: 'error',
-                    message: `Access Denied. You are logged in as: ${user.email}. Allowed Admins: ${JSON.stringify(getAdmins())}`
+                    message: `Access Denied. You are logged in as: ${user.email}.`
                 });
-                setLoading(false);
+                if (mounted) setLoading(false);
                 return;
             }
 
@@ -47,21 +47,35 @@ export default function AdminPage() {
                     throw new Error('Unauthorized or Failed to load');
                 }
                 const data = await res.json();
-                setUsers(data);
+                if (mounted) setUsers(data);
             } catch (err) {
                 console.error('Fetch Admin Users Error:', err);
-                // Try to get detailed error from response
-                setStatus({
-                    type: 'error',
-                    message: err.message === 'Unauthorized or Failed to load'
-                        ? 'Access Denied: You are not in the Admin List.'
-                        : `API Error: ${err.message}`
-                });
+                if (mounted) {
+                    setStatus({
+                        type: 'error',
+                        message: err.message === 'Unauthorized or Failed to load'
+                            ? 'Access Denied: You are not in the Admin List.'
+                            : `API Error: ${err.message}`
+                    });
+                }
             } finally {
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         }
-        init();
+
+        // Listen for auth state changes to handle initial load vs hydration
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+                router.push('/login');
+            } else if (session?.user && mounted) {
+                checkUser(session);
+            }
+        });
+
+        return () => {
+            mounted = false;
+            subscription.unsubscribe();
+        };
     }, [router, supabase]);
 
     const handleAssign = async (e) => {

@@ -5,6 +5,8 @@ import { importFromSheets } from '@/scripts/import_from_sheets'
 
 import { isAdmin } from '@/utils/admin';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
     try {
         const authClient = await createServerClient()

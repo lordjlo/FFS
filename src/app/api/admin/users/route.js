@@ -5,6 +5,8 @@ import { createClient as createServerClient } from '@/utils/supabase/server'
 
 import { isAdmin } from '@/utils/admin';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
     try {
         const authClient = await createServerClient()
