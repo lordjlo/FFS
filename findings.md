@@ -20,3 +20,7 @@
 ## Integration Discoveries
 *   **Google Sheets API**: Can use `google-spreadsheet` npm package for easy access.
 *   **YouTube**: Using IFrame API for private/unlisted video embedding ensures better performance and payment control.
+
+## Deployment
+*   **GitHub**: `https://github.com/lordjlo/FFS`
+*   **Live URL**: `https://ffs-hazel.vercel.app`
