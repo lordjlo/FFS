@@ -18,26 +18,32 @@ if (fs.existsSync(videoMappingsPath)) {
     videoMappings = JSON.parse(fs.readFileSync(videoMappingsPath, 'utf8'));
 }
 
-async function importFromSheets() {
-    // 0. Parse Arguments
-    const args = process.argv.slice(2);
-    const emailArg = args.find(a => a.startsWith('--email='));
-    const ownerEmail = emailArg ? emailArg.split('=')[1] : null;
+async function importFromSheets(targetEmail = null, targetSpreadsheetId = null) {
+    // 0. Parse Arguments if not provided
+    if (!targetEmail) {
+        const args = process.argv.slice(2);
+        const emailArg = args.find(a => a.startsWith('--email='));
+        targetEmail = emailArg ? emailArg.split('=')[1] : null;
+    }
+
+    const spreadsheetId = targetSpreadsheetId || process.env.GOOGLE_SHEETS_ID;
 
     try {
         let ownerId = null;
-        if (ownerEmail) {
-            console.log(`Looking up user with email: ${ownerEmail}`);
+        if (targetEmail) {
+            console.log(`Looking up user with email: ${targetEmail}`);
             // Lookup in profiles which maps auth.users
             const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('id')
-                .eq('email', ownerEmail)
+                .eq('email', targetEmail)
                 .single();
 
             if (profileError || !profile) {
-                console.error(`Error: Could not find user profile for ${ownerEmail}. Make sure they have logged in at least once.`);
-                process.exit(1);
+                console.error(`Error: Could not find user profile for ${targetEmail}. Make sure they have logged in at least once.`);
+                // If running as script, exit. If function, throw.
+                if (require.main === module) process.exit(1);
+                throw new Error(`User not found: ${targetEmail}`);
             }
             ownerId = profile.id;
             console.log(`Found User ID: ${ownerId}`);
@@ -50,22 +56,24 @@ async function importFromSheets() {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
 
-        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_ID, serviceAccountAuth);
+        const doc = new GoogleSpreadsheet(spreadsheetId, serviceAccountAuth);
         await doc.loadInfo();
         console.log(`Successfully loaded sheet: ${doc.title}`);
 
         const sheet = doc.sheetsByTitle['Strength Session'];
+        if (!sheet) throw new Error("Could not find tab named 'Strength Session'");
+
         const rows = await sheet.getRows();
 
         console.log(`Processing ${rows.length} rows...`);
 
         // 1. Ensure a program exists for this owner
-        const programTitle = ownerEmail ? `${doc.title} (${ownerEmail.split('@')[0]})` : doc.title;
+        const programTitle = targetEmail ? `${doc.title} (${targetEmail.split('@')[0]})` : doc.title;
         const { data: program, error: pError } = await supabase
             .from('programs')
             .upsert({
                 title: programTitle,
-                description: `Imported for ${ownerEmail || 'global'}`,
+                description: `Imported for ${targetEmail || 'global'}`,
                 owner_id: ownerId
             })
             .select()
@@ -125,7 +133,7 @@ async function importFromSheets() {
                             day_name: weekName,
                             week_number: w,
                             program_id: program.id
-                        })
+                        }, { onConflict: 'program_id, week_number, day_name' }) // Ensure checking constraint if exists, or simple update
                         .select()
                         .single();
 
@@ -149,11 +157,16 @@ async function importFromSheets() {
         }
 
         console.log('Import completed successfully.');
+        return { success: true, programId: program.id };
     } catch (error) {
         console.error('Error during import:', error.message);
+        if (require.main === module) process.exit(1);
+        throw error;
     }
 }
 
 if (require.main === module) {
     importFromSheets();
 }
+
+module.exports = { importFromSheets };
