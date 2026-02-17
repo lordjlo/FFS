@@ -32,6 +32,32 @@ export default function Dashboard() {
 
                 setUser(authUser);
 
+                // Check for pending name update from login
+                if (typeof window !== 'undefined') {
+                    const tempName = localStorage.getItem('ffs_temp_name');
+                    if (tempName) {
+                        try {
+                            // Fire and forget update
+                            await fetch('/api/user/update', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ display_name: tempName })
+                            });
+
+                            // Clear it
+                            localStorage.removeItem('ffs_temp_name');
+
+                            // Optimistically update local user state for immediate feedback
+                            setUser(prev => ({
+                                ...prev,
+                                user_metadata: { ...prev.user_metadata, first_name: tempName }
+                            }));
+                        } catch (e) {
+                            console.error('Failed to apply temp name:', e);
+                        }
+                    }
+                }
+
                 const data = await getLiveProgram();
                 setProgram(data);
 

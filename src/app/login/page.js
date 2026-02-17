@@ -42,8 +42,33 @@ export default function LoginPage() {
                     />
                 </div>
 
-                <h1 className={styles.title}>Welcome back, Kate</h1>
+                <h1 className={styles.title}>Welcome to FFS Kate</h1>
                 <p className={styles.subtitle}>Unlock your potential and track your progress</p>
+
+                <div style={{ marginBottom: '1.5rem', width: '100%' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                        What should Kate call you?
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Your Name (e.g. Sarah)"
+                        onChange={(e) => {
+                            if (typeof window !== 'undefined') {
+                                localStorage.setItem('ffs_temp_name', e.target.value);
+                            }
+                        }}
+                        style={{
+                            width: '100%',
+                            padding: '1rem',
+                            borderRadius: '12px',
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: 'white',
+                            fontSize: '1rem',
+                            outline: 'none'
+                        }}
+                    />
+                </div>
 
                 <button
                     onClick={handleGoogleLogin}
