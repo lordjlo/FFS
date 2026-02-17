@@ -122,7 +122,7 @@ export default function AdminPage() {
                             <option value="">-- Choose a user --</option>
                             {users.map(u => (
                                 <option key={u.id} value={u.email}>
-                                    {u.first_name || u.email} ({u.email})
+                                    {u.display_name || u.email} ({u.email})
                                 </option>
                             ))}
                         </select>
