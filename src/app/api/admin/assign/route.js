@@ -1,5 +1,5 @@
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient as createServerClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import { importFromSheets } from '@/scripts/import_from_sheets'
 
