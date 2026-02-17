@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Users, FileSpreadsheet, PlayCircle, AlertCircle, CheckCircle } from "lucide-react";
 
-import { isAdmin } from "@/utils/admin";
+import { isAdmin, getAdmins } from "@/utils/admin";
 
 export default function AdminPage() {
     const [users, setUsers] = useState([]);
@@ -21,15 +21,18 @@ export default function AdminPage() {
     useEffect(() => {
         async function init() {
             const { data: { user } } = await supabase.auth.getUser();
+            console.log('Admin Page Auth State:', { user: user?.email, admins: getAdmins() });
 
             // Client-Side Gate
             if (!user) {
+                console.warn('No user found, redirecting to login');
                 router.push('/login');
                 return;
             }
 
             if (!isAdmin(user.email)) {
-                router.push('/dashboard'); // Kick non-admins back to dashboard
+                console.warn(`${user.email} is not in admin list:`, getAdmins());
+                router.push('/dashboard');
                 return;
             }
 

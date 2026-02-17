@@ -19,6 +19,6 @@ export function getAdmins() {
  */
 export function isAdmin(email) {
     if (!email) return false;
-    const admins = getAdmins();
-    return admins.includes(email);
+    const admins = getAdmins().map(e => e.toLowerCase());
+    return admins.includes(email.toLowerCase());
 }
