@@ -13,7 +13,7 @@ export default function DashboardHeader({ user, selectedDate }) {
         else setGreeting("Good evening");
     }, []);
 
-    const firstName = user?.email?.split('@')[0] || 'Kate';
+    const firstName = user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Guest';
     const formattedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
     return (

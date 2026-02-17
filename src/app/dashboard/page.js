@@ -23,7 +23,13 @@ export default function Dashboard() {
         async function loadData() {
             try {
                 // Get current user
-                const { data: { user: authUser } } = await supabase.auth.getUser();
+                const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+                if (authError || !authUser) {
+                    window.location.href = '/login'; // Force full reload to clear any state
+                    return;
+                }
+
                 setUser(authUser);
 
                 const data = await getLiveProgram();
