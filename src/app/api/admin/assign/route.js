@@ -18,7 +18,11 @@ export async function POST(request) {
         }
 
         const body = await request.json();
-        const { targetEmail, spreadsheetId } = body;
+        const { targetEmail, spreadsheetId: rawSpreadsheetId } = body;
+
+        // Extract ID if full URL is provided
+        const navUrlMatch = rawSpreadsheetId?.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        const spreadsheetId = navUrlMatch ? navUrlMatch[1] : rawSpreadsheetId;
 
         if (!targetEmail) {
             return NextResponse.json({ error: 'Target email is required' }, { status: 400 });
