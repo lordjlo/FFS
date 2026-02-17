@@ -65,10 +65,24 @@ export default function AdminPage() {
 
         // Listen for auth state changes to handle initial load vs hydration
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_OUT') {
-                router.push('/login');
+            if (event === 'SIGNED_OUT' || !session?.user) {
+                if (mounted) {
+                    console.warn('AuthStateChange: No user session', event);
+                    router.push('/login');
+                }
             } else if (session?.user && mounted) {
                 checkUser(session);
+            }
+        });
+
+        // Explicit check to prevent hanging if onAuthStateChange doesn't fire
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (!user && mounted) {
+                console.warn('Explicit check: No user');
+                router.push('/login');
+            } else if (user && mounted) {
+                // We rely on onAuthStateChange usually, but if it missed:
+                checkUser({ user });
             }
         });
 
