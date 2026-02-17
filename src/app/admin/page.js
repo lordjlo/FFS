@@ -44,9 +44,14 @@ export default function AdminPage() {
                 const data = await res.json();
                 setUsers(data);
             } catch (err) {
-                console.error(err);
-                setStatus({ type: 'error', message: 'Access Denied or API Error' });
-                // Optional: router.push('/dashboard');
+                console.error('Fetch Admin Users Error:', err);
+                // Try to get detailed error from response
+                setStatus({
+                    type: 'error',
+                    message: err.message === 'Unauthorized or Failed to load'
+                        ? 'Access Denied: You are not in the Admin List.'
+                        : `API Error: ${err.message}`
+                });
             } finally {
                 setLoading(false);
             }

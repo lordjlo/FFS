@@ -15,9 +15,14 @@ export async function GET(request) {
         console.log('Admin API Access Attempt:', user?.email);
 
         // 1. Security Check
+        const admins = getAdmins();
         if (!user || !isAdmin(user.email)) {
-            console.warn('Admin API: Access denied for', user?.email);
-            return NextResponse.json({ error: 'Unauthorized: Admin access required' }, { status: 403 })
+            console.warn('Admin API: Access denied for', user?.email, 'Admin list:', admins);
+            return NextResponse.json({
+                error: 'Unauthorized: Admin access required',
+                attempted: user?.email || 'No Session',
+                allowed: admins
+            }, { status: 403 })
         }
 
         // 2. Initialize Service Role Client to fetch all profiles
