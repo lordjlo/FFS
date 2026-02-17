@@ -44,6 +44,10 @@ export default function AdminPage() {
             try {
                 const res = await fetch('/api/admin/users');
                 if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    if (errorData.attempted) {
+                        throw new Error(`Server says no. Attempted: ${errorData.attempted}, Allowed: ${errorData.allowed}`);
+                    }
                     throw new Error('Unauthorized or Failed to load');
                 }
                 const data = await res.json();
